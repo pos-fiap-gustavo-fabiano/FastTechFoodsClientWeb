@@ -1,0 +1,46 @@
+apiVersion: apps/v1alpha1
+kind: ContainerApp
+metadata:
+  name: fasttech-frontend
+spec:
+  environmentId: /subscriptions/{subscription-id}/resourceGroups/rg-fasttech-foods/providers/Microsoft.App/managedEnvironments/cae-fasttech-foods
+  configuration:
+    activeRevisionsMode: single
+    ingress:
+      external: true
+      targetPort: 80
+      traffic:
+      - weight: 100
+        latestRevision: true
+    registries:
+    - server: fasttechregistry.azurecr.io
+      identity: system
+    secrets:
+    - name: vite-order-api-url
+      value: "https://api.fasttech.com"
+    - name: vite-menu-api-url
+      value: "https://menu.fasttech.com"
+    - name: vite-auth-api-url
+      value: "https://auth.fasttech.com"
+  template:
+    containers:
+    - image: fasttechregistry.azurecr.io/fasttech-frontend:latest
+      name: fasttech-frontend
+      env:
+      - name: VITE_ORDER_API_BASE_URL
+        secretRef: vite-order-api-url
+      - name: VITE_MENU_API_BASE_URL
+        secretRef: vite-menu-api-url
+      - name: VITE_AUTH_API_BASE_URL
+        secretRef: vite-auth-api-url
+      resources:
+        cpu: 0.5
+        memory: 1.0Gi
+    scale:
+      minReplicas: 1
+      maxReplicas: 10
+      rules:
+      - name: http-scaling
+        http:
+          metadata:
+            concurrentRequests: "30"

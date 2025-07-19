@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Tentar login na API real
       const response = await authApi.login(emailOrCpf, password);
       
-      if (response.token && response.user) {
+      if (response.access_token && response.user) {
         const userData: User = {
           id: response.user.id,
           name: response.user.name,
@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         setUser(userData);
         localStorage.setItem('fasttech_user', JSON.stringify(userData));
-        localStorage.setItem('fasttech_token', response.token);
+        localStorage.setItem('fasttech_token', response.access_token);
         localStorage.setItem('fasttech_refresh_token', response.refreshToken);
         console.log('Login realizado com sucesso via API');
         return true;

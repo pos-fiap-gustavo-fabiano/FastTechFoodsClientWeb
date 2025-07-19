@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Copiar apenas package files primeiro para melhor cache
 COPY package*.json ./
+COPY bun.lockb* ./
 
 # Instalar todas as dependências (incluindo devDependencies para o build)
 RUN npm ci --legacy-peer-deps
@@ -12,7 +13,7 @@ RUN npm ci --legacy-peer-deps
 # Copiar código fonte
 COPY . .
 
-# Build da aplicação
+# Build da aplicação para produção
 RUN npm run build
 
 # Production stage
