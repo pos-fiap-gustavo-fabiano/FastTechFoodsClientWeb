@@ -34,6 +34,7 @@ jobs:
           app_location: "/"
           api_location: ""
           output_location: "dist"
+          app_build_command: 'npm ci --legacy-peer-deps && npm run build'
         env:
           VITE_ORDER_API_BASE_URL: ${{ env.VITE_ORDER_API_BASE_URL }}
           VITE_MENU_API_BASE_URL: ${{ env.VITE_MENU_API_BASE_URL }}
