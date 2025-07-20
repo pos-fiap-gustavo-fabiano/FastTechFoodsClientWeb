@@ -70,6 +70,9 @@ jobs:
           console.log(\`Server running on port \${port}\`);
         });
         EOF
+        
+        # Install dependencies
+        npm install --production
 
     - name: 'Deploy to Azure Web App'
       uses: azure/webapps-deploy@v2
