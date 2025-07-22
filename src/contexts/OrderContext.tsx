@@ -250,8 +250,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           updateOrderStatus(randomOrder.id, nextStatus);
         }
       }
-    }, 10000); // Update every 10 seconds for demo
-
+    }, 1000000); 
     return () => clearInterval(interval);
   }, [orders]);
 

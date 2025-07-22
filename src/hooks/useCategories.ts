@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Category } from '@/types';
 import { config } from '@/lib/config';
+import { getAuthHeaders } from '@/lib/auth';
 
 const useCategories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -11,7 +12,9 @@ const useCategories = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${config.menuApiBaseUrl}/api/categories`);
+        const response = await fetch(`${config.menuApiBaseUrl}/api/categories`, {
+          headers: getAuthHeaders()
+        });
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

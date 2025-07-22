@@ -7,11 +7,54 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+// Componente para input de senha com botão de mostrar/ocultar (movido para fora)
+const PasswordInput = ({ 
+  id, 
+  placeholder, 
+  value, 
+  onChange, 
+  showPassword, 
+  onTogglePassword,
+  required = false 
+}: {
+  id: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  showPassword: boolean;
+  onTogglePassword: () => void;
+  required?: boolean;
+}) => (
+  <div className="relative">
+    <Input
+      id={id}
+      type={showPassword ? "text" : "password"}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="pr-10"
+    />
+    <button
+      type="button"
+      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+      onClick={onTogglePassword}
+    >
+      {showPassword ? (
+        <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+      ) : (
+        <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+      )}
+    </button>
+  </div>
+);
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -24,6 +67,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     password: '',
     confirmPassword: ''
   });
+  
+  // Estados para controlar visibilidade das senhas
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showCpfPassword, setShowCpfPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const { login, register, isLoading, error } = useAuth();
   const { toast } = useToast();
 
@@ -147,12 +197,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               </div>
               <div>
                 <Label htmlFor="password">Senha</Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   placeholder="Sua senha"
                   value={loginData.password}
                   onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                  showPassword={showLoginPassword}
+                  onTogglePassword={() => setShowLoginPassword(!showLoginPassword)}
                   required
                 />
               </div>
@@ -183,12 +234,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               </div>
               <div>
                 <Label htmlFor="cpf-password">Senha</Label>
-                <Input
+                <PasswordInput
                   id="cpf-password"
-                  type="password"
                   placeholder="Sua senha"
                   value={cpfLoginData.password}
                   onChange={(e) => setCpfLoginData({...cpfLoginData, password: e.target.value})}
+                  showPassword={showCpfPassword}
+                  onTogglePassword={() => setShowCpfPassword(!showCpfPassword)}
                   required
                 />
               </div>
@@ -249,23 +301,25 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               </div>
               <div>
                 <Label htmlFor="register-password">Senha</Label>
-                <Input
+                <PasswordInput
                   id="register-password"
-                  type="password"
                   placeholder="Sua senha"
                   value={registerData.password}
                   onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                  showPassword={showRegisterPassword}
+                  onTogglePassword={() => setShowRegisterPassword(!showRegisterPassword)}
                   required
                 />
               </div>
               <div>
                 <Label htmlFor="confirm-password">Confirmar Senha</Label>
-                <Input
+                <PasswordInput
                   id="confirm-password"
-                  type="password"
                   placeholder="Confirme sua senha"
                   value={registerData.confirmPassword}
                   onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                  showPassword={showConfirmPassword}
+                  onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
                   required
                 />
               </div>

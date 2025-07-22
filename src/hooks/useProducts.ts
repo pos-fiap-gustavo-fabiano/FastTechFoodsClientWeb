@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Product } from '@/types';
 import { config } from '@/lib/config';
+import { getAuthHeaders } from '@/lib/auth';
 
 interface UseProductsParams {
   categoryId?: string | null;
@@ -28,7 +29,9 @@ const useProducts = ({ categoryId, search }: UseProductsParams = {}) => {
           url.searchParams.append('search', search.trim());
         }
         
-        const response = await fetch(url.toString());
+        const response = await fetch(url.toString(), {
+          headers: getAuthHeaders()
+        });
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

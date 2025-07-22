@@ -16,7 +16,9 @@ import {
 import { useAuth } from '@/hooks/useAuthContext';
 import OrderStatusBadge from '@/components/OrderStatusBadge';
 import OrderProgress from '@/components/OrderProgress';
+import CancelOrderModal from '@/components/CancelOrderModal';
 import useOrdersApi from '@/hooks/useOrdersApi';
+import useCancelOrder from '@/hooks/useCancelOrder';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { MapPin, Clock, Car, Store, ArrowLeft, Loader2 } from 'lucide-react';
@@ -26,11 +28,45 @@ const ITEMS_PER_PAGE = 6;
 const Orders = () => {
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string>('');
   
   // Buscar pedidos da API
-  const { orders, loading, error } = useOrdersApi({ 
+  const { orders, loading, error, refetch } = useOrdersApi({ 
     customerId: user?.id 
   });
+
+  // Hook para cancelar pedidos
+  const { cancelOrder, isLoading: isCancelling } = useCancelOrder();
+
+  // Funções para controlar o modal de cancelamento
+  const handleCancelClick = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setCancelModalOpen(true);
+  };
+
+  const handleCancelConfirm = async (reason: string) => {
+    if (!user?.id || !selectedOrderId) return;
+    
+    const success = await cancelOrder(selectedOrderId, reason, user.id);
+    if (success) {
+      setCancelModalOpen(false);
+      setSelectedOrderId('');
+      // Recarregar os pedidos
+      refetch();
+    }
+  };
+
+  const handleCancelModalClose = () => {
+    setCancelModalOpen(false);
+    setSelectedOrderId('');
+  };
+
+  // Verificar se o pedido pode ser cancelado
+  const canCancelOrder = (status: string): boolean => {
+    const mappedStatus = mapStatus(status);
+    return mappedStatus === 'pending' || mappedStatus === 'accepted';
+  };
 
   // Mapear status da API para os status do componente
   const mapStatus = (apiStatus: string): 'pending' | 'accepted' | 'preparing' | 'ready' | 'completed' | 'cancelled' => {
@@ -209,16 +245,22 @@ const Orders = () => {
                         </span>
                       </div>
 
-                      {mapStatus(order.status) === 'pending' && (
+                      {canCancelOrder(order.status) && (
                         <Button 
                           variant="outline" 
                           size="sm" 
                           className="w-full"
-                          onClick={() => {
-                            console.log('Cancelar pedido:', order.id);
-                          }}
+                          onClick={() => handleCancelClick(order.id)}
+                          disabled={isCancelling}
                         >
-                          Cancelar Pedido
+                          {isCancelling && selectedOrderId === order.id ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Cancelando...
+                            </>
+                          ) : (
+                            'Cancelar Pedido'
+                          )}
                         </Button>
                       )}
                     </CardContent>
@@ -264,6 +306,15 @@ const Orders = () => {
           </>
         )}
       </main>
+
+      {/* Modal de Cancelamento */}
+      <CancelOrderModal
+        isOpen={cancelModalOpen}
+        onClose={handleCancelModalClose}
+        onConfirm={handleCancelConfirm}
+        orderId={selectedOrderId}
+        isLoading={isCancelling}
+      />
     </div>
   );
 };

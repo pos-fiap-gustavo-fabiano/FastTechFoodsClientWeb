@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { config } from '@/lib/config';
 import { getAuthHeaders } from '@/lib/auth';
 
@@ -37,40 +37,40 @@ const useOrdersApi = ({ customerId }: UseOrdersApiParams = {}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!customerId) {
-        setLoading(false);
-        return;
+  const fetchOrders = useCallback(async () => {
+    if (!customerId) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const url = `${config.orderApiBaseUrl}/api/orders?customerId=${customerId}`;
+      const response = await fetch(url, {
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      try {
-        setLoading(true);
-        setError(null);
-
-        const url = `${config.orderApiBaseUrl}/api/orders?customerId=${customerId}`;
-        const response = await fetch(url, {
-          headers: getAuthHeaders()
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setOrders(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro ao carregar pedidos');
-        console.error('Erro ao buscar pedidos:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
+      const data = await response.json();
+      setOrders(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar pedidos');
+      console.error('Erro ao buscar pedidos:', err);
+    } finally {
+      setLoading(false);
+    }
   }, [customerId]);
 
-  return { orders, loading, error };
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  return { orders, loading, error, refetch: fetchOrders };
 };
 
 export default useOrdersApi;
