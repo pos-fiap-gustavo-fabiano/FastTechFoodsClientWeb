@@ -17,11 +17,12 @@ import { useAuth } from '@/hooks/useAuthContext';
 import OrderStatusBadge from '@/components/OrderStatusBadge';
 import OrderProgress from '@/components/OrderProgress';
 import CancelOrderModal from '@/components/CancelOrderModal';
+import TelegramNotificationModal from '@/components/TelegramNotificationModal';
 import useOrdersApi from '@/hooks/useOrdersApi';
 import useCancelOrder from '@/hooks/useCancelOrder';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { MapPin, Clock, Car, Store, ArrowLeft, Loader2 } from 'lucide-react';
+import { MapPin, Clock, Car, Store, ArrowLeft, Loader2, Bell } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -30,6 +31,7 @@ const Orders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
+  const [notificationModalOpen, setNotificationModalOpen] = useState(false);
   
   // Buscar pedidos da API
   const { orders, loading, error, refetch } = useOrdersApi({ 
@@ -136,8 +138,20 @@ const Orders = () => {
               </Link>
               <h1 className="text-2xl font-bold text-gray-900">Meus Pedidos</h1>
             </div>
-            <div className="gradient-primary text-white px-4 py-2 rounded-lg font-bold text-lg">
-              FastTech Foods
+            <div className="flex items-center space-x-4">
+              <Button
+                onClick={() => setNotificationModalOpen(true)}
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-2 hover:bg-blue-500 hover:text-white transition-colors"
+                title="Receber notificações no Telegram"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="hidden sm:inline">Notificações</span>
+              </Button>
+              <div className="gradient-primary text-white px-4 py-2 rounded-lg font-bold text-lg">
+                FastTech Foods
+              </div>
             </div>
           </div>
         </div>
@@ -175,9 +189,24 @@ const Orders = () => {
               <p className="text-gray-400 mb-6">
                 Faça seu primeiro pedido para acompanhar aqui!
               </p>
-              <Link to="/">
-                <Button>Fazer Pedido</Button>
-              </Link>
+              <div className="space-y-4">
+                <Link to="/">
+                  <Button>Fazer Pedido</Button>
+                </Link>
+                <div className="border-t pt-4">
+                  <p className="text-sm text-gray-500 mb-3">
+                    💡 Dica: Configure as notificações do Telegram para receber atualizações em tempo real!
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setNotificationModalOpen(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Bell className="h-4 w-4" />
+                    Configurar Notificações
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
@@ -314,6 +343,13 @@ const Orders = () => {
         onConfirm={handleCancelConfirm}
         orderId={selectedOrderId}
         isLoading={isCancelling}
+      />
+
+      {/* Modal de Notificações Telegram */}
+      <TelegramNotificationModal
+        isOpen={notificationModalOpen}
+        onClose={() => setNotificationModalOpen(false)}
+        orderId={selectedOrderId}
       />
     </div>
   );

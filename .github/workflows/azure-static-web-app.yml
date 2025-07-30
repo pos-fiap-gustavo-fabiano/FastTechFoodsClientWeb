@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
 
 env:
-  VITE_AUTH_API_BASE_URL: 'https://apim-hackathon-fiap.azure-api.net/identity'
-  VITE_MENU_API_BASE_URL: 'https://apim-hackathon-fiap.azure-api.net/menu'
-  VITE_ORDER_API_BASE_URL: 'https://apim-hackathon-fiap.azure-api.net/orders'
+  VITE_AUTH_API_BASE_URL: 'https://apim-fastechfood.azure-api.net/identity'
+  VITE_MENU_API_BASE_URL: 'https://apim-fastechfood.azure-api.net/menu'
+  VITE_ORDER_API_BASE_URL: 'https://apim-fastechfood.azure-api.net/orders'
 
 jobs:
   build_and_deploy_job:

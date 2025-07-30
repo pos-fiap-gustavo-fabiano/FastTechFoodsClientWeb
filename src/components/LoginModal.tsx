@@ -12,6 +12,7 @@ import { Eye, EyeOff } from 'lucide-react';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  customMessage?: string;
 }
 
 // Componente para input de senha com botão de mostrar/ocultar (movido para fora)
@@ -56,7 +57,7 @@ const PasswordInput = ({
   </div>
 );
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, customMessage }) => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [cpfLoginData, setCpfLoginData] = useState({ cpf: '', password: '' });
   const [registerData, setRegisterData] = useState({ 
@@ -174,6 +175,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             FastTech Foods
           </DialogTitle>
         </DialogHeader>
+        
+        {/* Mensagem customizada */}
+        {customMessage && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <div className="flex items-center gap-2 text-blue-800">
+              <span className="text-lg">📱</span>
+              <p className="text-sm font-medium">{customMessage}</p>
+            </div>
+          </div>
+        )}
         
         <Tabs defaultValue="email" className="w-full">
           <TabsList className="grid w-full grid-cols-3">

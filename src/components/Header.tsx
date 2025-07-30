@@ -10,10 +10,11 @@ import { useNotifications } from '@/contexts/NotificationContext';
 interface HeaderProps {
   onCartClick: () => void;
   onLoginClick: () => void;
+  onNotificationClick?: () => void;
   onOrdersClick?: () => void; // Made optional since we're using navigation now
 }
 
-const Header: React.FC<HeaderProps> = ({ onCartClick, onLoginClick }) => {
+const Header: React.FC<HeaderProps> = ({ onCartClick, onLoginClick, onNotificationClick }) => {
   const { user, logout } = useAuth();
   const { itemCount } = useCart();
   const { unreadCount } = useNotifications();
@@ -42,18 +43,22 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onLoginClick }) => {
                 </div>
 
                 {/* Notifications */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="relative"
-                >
-                  <Bell className="h-4 w-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                      {unreadCount}
-                    </span>
-                  )}
-                </Button>
+                {onNotificationClick && (
+                  <Button
+                    onClick={onNotificationClick}
+                    variant="outline"
+                    size="sm"
+                    className="relative hover:bg-blue-500 hover:text-white transition-colors"
+                    title="Configurar notificações Telegram"
+                  >
+                    <Bell className="h-4 w-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                )}
 
                 {/* Orders Button */}
                 <Button
