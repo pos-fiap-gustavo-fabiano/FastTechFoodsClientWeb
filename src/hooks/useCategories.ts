@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Category } from '@/types';
 import { config } from '@/lib/config';
-import { getAuthHeaders } from '@/lib/auth';
+import { apiGetData } from '@/lib/api';
 
 const useCategories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -12,16 +12,8 @@ const useCategories = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${config.menuApiBaseUrl}/api/categories`, {
-          headers: getAuthHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setCategories(data);
+        const data = await apiGetData(`${config.menuApiBaseUrl}/api/categories`);
+        setCategories(data as Category[]);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao carregar categorias');

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Product } from '@/types';
 import { config } from '@/lib/config';
-import { getAuthHeaders } from '@/lib/auth';
+import { apiGetData } from '@/lib/api';
 
 interface UseProductsParams {
   categoryId?: string | null;
@@ -29,16 +29,8 @@ const useProducts = ({ categoryId, search }: UseProductsParams = {}) => {
           url.searchParams.append('search', search.trim());
         }
         
-        const response = await fetch(url.toString(), {
-          headers: getAuthHeaders()
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setProducts(data);
+        const data = await apiGetData(url.toString());
+        setProducts(data as Product[]);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao carregar produtos');

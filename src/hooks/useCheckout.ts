@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CreateOrderDto, CreateOrderItemDto, CartItem, DeliveryMethod } from '@/types';
 import { config } from '@/lib/config';
-import { getAuthHeaders } from '@/lib/auth';
+import { apiPostData } from '@/lib/api';
 
 interface UseCheckoutParams {
   onSuccess?: (orderId: string) => void;
@@ -38,21 +38,12 @@ const useCheckout = ({ onSuccess, onError }: UseCheckoutParams = {}) => {
 
       console.log('Criando pedido com os seguintes dados:', createOrderDto);
 
-      const response = await fetch(`${config.orderApiBaseUrl}/api/orders`, {
-        method: 'POST',
-        headers: {
-          ...getAuthHeaders(),
-        },
-        body: JSON.stringify(createOrderDto)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(`Erro ao criar pedido: ${response.status} - ${errorData}`);
-      }
-
-      const result = await response.json();
-      const orderId = result.id || result.orderId || Date.now().toString();
+      // Usar nossa função de API que trata erros de JSON automaticamente
+      const result = await apiPostData(`${config.orderApiBaseUrl}/api/orders`, createOrderDto);
+      
+      // Extrair o ID do pedido da resposta
+      const resultData = result as Record<string, unknown>;
+      const orderId = String(resultData?.id || resultData?.orderId || Date.now());
       
       onSuccess?.(orderId);
       return orderId;
